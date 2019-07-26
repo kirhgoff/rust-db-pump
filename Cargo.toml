@@ -1,0 +1,7 @@
+[package]
+name = "rust-db-pump"
+version = "0.1.0"
+authors = ["Kirill Lastovirya <kirill.lastovirya@jobseeker.com.au>"]
+edition = "2018"
+
+[dependencies]
