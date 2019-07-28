@@ -5,3 +5,5 @@ authors = ["Kirill Lastovirya <kirill.lastovirya@jobseeker.com.au>"]
 edition = "2018"
 
 [dependencies]
+diesel = { version = "1.3.0", features = ["postgres"] }
+dotenv = "0.10"
