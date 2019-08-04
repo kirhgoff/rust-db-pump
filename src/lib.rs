@@ -21,6 +21,18 @@ pub struct TableDescriptor {
 }
 
 impl TableDescriptor {
+    pub fn all_fields_count(&self) -> usize {
+        self.key_field_names.len() + self.field_names.len()
+    }
+
+    pub fn all_fields(&self) -> Vec<String> {
+        self.fields_iter().cloned().collect::<Vec<String>>()
+    }
+
+    pub fn fields_iter(&self) -> impl Iterator<Item = &String> {
+        self.key_field_names.iter().chain(self.field_names.iter())
+    }
+
     pub fn insert_query(&self) -> String {
         let fields = self.field_names.join(", ");
 
@@ -32,21 +44,47 @@ impl TableDescriptor {
 
         format!("INSERT INTO {:} ({:}) VALUES({:})", self.name, fields, indices)
     }
+
+    pub fn select_query(&self) -> String {
+        let all_fields = self.all_fields().join(", ");
+        format!("SELECT {:} FROM {:}", all_fields, self.name)
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    #[test]
-    fn table_descriptor_insert_query() {
-        let desc = TableDescriptor {
+    fn create_descriptor() -> TableDescriptor {
+        TableDescriptor {
             name: "bebe".to_string(),
             key_field_names: vec!["keyFieldC".to_string()],
             field_names: vec!["fieldA".to_string(), "fieldB".to_string()]
-        };
+        }
+    }
+
+    #[test]
+    fn table_descriptor_fields_iter() {
+        let desc = create_descriptor();
+        let mut iter = desc.fields_iter();
+
+        assert_eq!(Some(&"keyFieldC".to_string()), iter.next());
+        assert_eq!(Some(&"fieldA".to_string()), iter.next());
+        assert_eq!(Some(&"fieldB".to_string()), iter.next());
+    }
+
+    #[test]
+    fn table_descriptor_insert_query() {
+        let desc = create_descriptor();
 
         assert_eq!(desc.insert_query(), "INSERT INTO bebe (fieldA, fieldB) VALUES($1, $2)");
+    }
+
+    #[test]
+    fn table_descriptor_select_query() {
+        let desc = create_descriptor();
+
+        assert_eq!(desc.select_query(), "SELECT keyFieldC, fieldA, fieldB FROM bebe");
     }
 }
 
