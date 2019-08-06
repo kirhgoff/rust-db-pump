@@ -6,5 +6,5 @@ edition = "2018"
 
 [dependencies]
 dotenv = "0.10"
-postgres = "0.15"
+postgres = "*"
 rand = "0.7"
